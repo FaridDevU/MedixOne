@@ -16,5 +16,6 @@
   },
   "emmet.includeLanguages": {
     "css": "css"
-  }
+  },
+  "git.ignoreLimitWarning": true
 }
