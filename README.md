@@ -238,17 +238,7 @@ Bienvenidas las contribuciones de especialistas en tecnología de salud y profes
 
 ## �‍💻 Desarrollador
 
-**Desarrollado por**: [Tu Nombre]  
-**Email**: tu.email@profesional.com  
-**LinkedIn**: [Tu Perfil de LinkedIn]  
-**Portfolio**: [Tu Sitio Web Profesional]  
+**Desarrollado por**: Diego Farid Garcia Urdiales 
+**Email**: fgarciau09@gmail.com
 
-## 📄 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT - consulta el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-**Construido con pasión por la innovación en salud y la transformación digital en instituciones médicas.**
-
-*Diseñado para organizaciones de salud empresariales que buscan soluciones modernas, escalables y conformes de gestión médica.*
