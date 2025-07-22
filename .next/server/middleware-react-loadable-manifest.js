@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"contexts\\\\LanguageContext.tsx -> @/translations/es.json\":{\"id\":\"contexts\\\\LanguageContext.tsx -> @/translations/es.json\",\"files\":[\"static/chunks/src_translations_es_json.js\"]}}"

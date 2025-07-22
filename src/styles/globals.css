@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+  }
+
+  .form-input {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+}
+
+@layer utilities {
+  .text-medical {
+    color: #0284c7;
+  }
+
+  .bg-medical {
+    background-color: #0284c7;
+  }
+
+  .border-medical {
+    border-color: #0284c7;
+  }
+}
+
+/* Variables de color y tema para MedixOne */
+:root {
+  --background: #fff;
+  --foreground: #222;
+  --card: #fff;
+  --card-foreground: #222;
+  --popover: #fff;
+  --popover-foreground: #222;
+  --primary: #0ea5e9;
+  --primary-foreground: #222;
+  --secondary: #e0f2fe;
+  --secondary-foreground: #222;
+  --muted: #e0f2fe;
+  --muted-foreground: #666;
+  --accent: #e0f2fe;
+  --accent-foreground: #222;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #0ea5e9;
+  --radius: 8px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.medical-container {
+  background: linear-gradient(135deg, #e0f2fe 0%, #fff 100%);
+  min-height: 100vh;
+}
+
+.medical-card {
+  background: #fff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.medical-button {
+  background: #0ea5e9;
+  color: #fff;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.medical-button:hover {
+  background: #0369a1;
+}
+
+.medical-input {
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+.status-scheduled {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.status-confirmed {
+  background: #bbf7d0;
+  color: #166534;
+}
+.status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.status-completed {
+  background: #f3f4f6;
+  color: #374151;
+}
+.lab-normal {
+  color: #16a34a;
+}
+.lab-abnormal {
+  color: #dc2626;
+  font-weight: bold;
+}
+.priority-high {
+  color: #dc2626;
+}
+.priority-medium {
+  color: #f59e0b;
+}
+.priority-low {
+  color: #16a34a;
+}

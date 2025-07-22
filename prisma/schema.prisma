@@ -1,0 +1,347 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuario con roles
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  sessions       Session[]
+  accounts       Account[]
+  doctorProfile  Doctor?
+  patientProfile Patient?
+  appointments   Appointment[]
+  prescriptions  Prescription[]
+  labResults     LabResult[]
+  auditLogs      AuditLog[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
+  PATIENT
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Perfil del Doctor
+model Doctor {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  specialization String
+  licenseNumber  String  @unique
+  phone          String?
+  biography      String?
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments  Appointment[]
+  prescriptions Prescription[]
+
+  @@map("doctors")
+}
+
+// Perfil del Paciente
+model Patient {
+  id              String    @id @default(cuid())
+  userId          String?   @unique
+  firstName       String
+  lastName        String
+  email           String?
+  phone           String
+  dateOfBirth     DateTime
+  gender          Gender
+  address         String?
+  emergencyContact String?
+  bloodType       BloodType?
+  allergies       String?
+  chronicDiseases String?
+  insurance       String?
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user          User?            @relation(fields: [userId], references: [id])
+  appointments  Appointment[]
+  medicalRecord MedicalRecord[]
+  prescriptions Prescription[]
+  labSamples    LabSample[]
+  labResults    LabResult[]
+  documents     Document[]
+
+  @@map("patients")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+// Citas médicas
+model Appointment {
+  id          String            @id @default(cuid())
+  patientId   String
+  doctorId    String
+  userId      String
+  date        DateTime
+  duration    Int               @default(30) // minutos
+  type        AppointmentType
+  status      AppointmentStatus
+  reason      String
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("appointments")
+}
+
+enum AppointmentType {
+  CONSULTATION
+  FOLLOW_UP
+  EMERGENCY
+  SURGERY
+  CHECKUP
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// Expediente médico
+model MedicalRecord {
+  id          String   @id @default(cuid())
+  patientId   String
+  date        DateTime @default(now())
+  symptoms    String
+  diagnosis   String
+  treatment   String
+  notes       String?
+  followUp    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@map("medical_records")
+}
+
+// Recetas médicas
+model Prescription {
+  id          String   @id @default(cuid())
+  patientId   String
+  doctorId    String
+  userId      String
+  date        DateTime @default(now())
+  medications Json     // Array de medicamentos con dosis, frecuencia, etc.
+  instructions String?
+  validUntil  DateTime?
+  signed      Boolean  @default(false)
+  pdfPath     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("prescriptions")
+}
+
+// Muestras de laboratorio
+model LabSample {
+  id          String          @id @default(cuid())
+  patientId   String
+  sampleType  LabSampleType
+  collectedAt DateTime        @default(now())
+  status      LabSampleStatus
+  notes       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  patient    Patient     @relation(fields: [patientId], references: [id])
+  labResults LabResult[]
+
+  @@map("lab_samples")
+}
+
+enum LabSampleType {
+  BLOOD
+  URINE
+  STOOL
+  SALIVA
+  TISSUE
+  OTHER
+}
+
+enum LabSampleStatus {
+  COLLECTED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+// Resultados de laboratorio
+model LabResult {
+  id           String         @id @default(cuid())
+  patientId    String
+  sampleId     String?
+  userId       String
+  testName     String
+  testType     LabTestType
+  value        String
+  unit         String?
+  referenceMin Float?
+  referenceMax Float?
+  status       LabResultStatus
+  isAbnormal   Boolean        @default(false)
+  notes        String?
+  testedAt     DateTime       @default(now())
+  reportedAt   DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  patient   Patient    @relation(fields: [patientId], references: [id])
+  sample    LabSample? @relation(fields: [sampleId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@map("lab_results")
+}
+
+enum LabTestType {
+  BLOOD_COUNT
+  CHEMISTRY
+  IMMUNOLOGY
+  MICROBIOLOGY
+  PATHOLOGY
+  RADIOLOGY
+  OTHER
+}
+
+enum LabResultStatus {
+  PENDING
+  COMPLETED
+  REVIEWED
+  CORRECTED
+}
+
+// Documentos médicos
+model Document {
+  id          String       @id @default(cuid())
+  patientId   String
+  fileName    String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  category    DocumentType
+  description String?
+  uploadedAt  DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@map("documents")
+}
+
+enum DocumentType {
+  ANALYSIS
+  STUDY
+  REPORT
+  IMAGE
+  OTHER
+}
+
+// Auditoría y logs
+model AuditLog {
+  id        String    @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  oldValues Json?
+  newValues Json?
+  ipAddress String?
+  userAgent String?
+  timestamp DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
